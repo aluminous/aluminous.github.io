@@ -10,14 +10,26 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
 <html>
 <head>
     <title>YouTube Video Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        textarea {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
     <div>
         <label for="videoInput">Enter Video IDs (Format: id,start,end):</label><br>
-        <textarea id="videoInput" rows="5" cols="50"></textarea><br>
+        <textarea id="videoInput" rows="5"></textarea><br>
         <label for="playMode">Play Mode:</label>
         <select id="playMode">
             <option value="random">Random</option>
+            <option value="randomNoRepeat">Random (No Repeats)</option>
             <option value="sequential">Sequential</option>
             <option value="repeat">Repeat</option>
         </select><br>
@@ -31,11 +43,12 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
         let player;
         let videoQueue = [];
         let currentIndex = 0;
+        let lastIndex = -1;
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                height: '390',
-                width: '640',
+                height: '320px',
+                width: '100%',
                 events: {
                     'onReady': onPlayerReady,
                     'onStateChange': onPlayerStateChange
@@ -78,8 +91,16 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
         }
 
         function playNextVideo() {
-            if (document.getElementById('playMode').value === 'random') {
+            const playMode = document.getElementById('playMode').value;
+            if (playMode === 'random') {
                 currentIndex = Math.floor(Math.random() * videoQueue.length);
+            } else if (playMode === 'randomNoRepeat') {
+                let newIndex;
+                do {
+                    newIndex = Math.floor(Math.random() * videoQueue.length);
+                } while (newIndex === lastIndex && videoQueue.length > 1);
+                currentIndex = newIndex;
+                lastIndex = currentIndex;
             } else {
                 currentIndex = (currentIndex + 1) % videoQueue.length;
             }
