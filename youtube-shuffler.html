@@ -24,28 +24,72 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
 </head>
 <body>
     <div>
-        <label for="videoInput">Enter Video IDs (Format: id,start,end):</label><br>
+        <label id="videoInputLabel"></label><br>
         <textarea id="videoInput" rows="5"></textarea><br>
-        <label for="playMode">Play Mode:</label>
+        <label id="playModeLabel"></label>
         <select id="playMode">
-            <option value="random">Random</option>
-            <option value="randomNoRepeat">Random (No Repeats)</option>
-            <option value="sequential">Sequential</option>
-            <option value="repeat">Repeat</option>
+            <option value="random"></option>
+            <option value="randomNoRepeat"></option>
+            <option value="sequential"></option>
+            <option value="repeat"></option>
         </select><br>
-        <label for="videoSelect">Select Video:</label>
+        <label id="videoSelectLabel"></label>
         <select id="videoSelect"></select><br>
-        <button id="startButton">Start</button>
+        <button id="startButton"></button>
     </div>
 
     <div id="player"></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
+        // Translation map
+        const translations = {
+            en: {
+                videoInputLabel: 'Enter Video IDs (Format: id,start,end):',
+                startButton: 'Start',
+                playModeLabel: 'Play Mode:',
+                playMode: {
+                    random: 'Random',
+                    randomNoRepeat: 'Random (No Repeats)',
+                    sequential: 'Sequential',
+                    repeat: 'Repeat'
+                },
+                videoSelectLabel: 'Select Video:'
+            },
+            ko: {
+                videoInputLabel: '비디오 ID 입력 (형식: id,start,end):',
+                startButton: '시작',
+                playModeLabel: '재생 모드:',
+                playMode: {
+                    random: '무작위',
+                    randomNoRepeat: '반복 없는 무작위',
+                    sequential: '차례대로',
+                    repeat: '반복'
+                },
+                videoSelectLabel: '비디오 선택:'
+            }
+        };
+
+        let language = navigator.language.split('-')[0];
+        if (!translations[language]) {
+            language = 'en';
+        }
+
         let player;
         let videoQueue = [];
         let currentIndex = 0;
         let lastIndex = -1;
+
+        document.getElementById('videoInputLabel').textContent = translations[language].videoInputLabel;
+        document.getElementById('startButton').textContent = translations[language].startButton;
+        document.getElementById('playModeLabel').textContent = translations[language].playModeLabel;
+        document.getElementById('videoSelectLabel').textContent = translations[language].videoSelectLabel;
+        
+        const playModeOptions = document.getElementById('playMode').options;
+        playModeOptions[0].text = translations[language].playMode.random;
+        playModeOptions[1].text = translations[language].playMode.randomNoRepeat;
+        playModeOptions[2].text = translations[language].playMode.sequential;
+        playModeOptions[3].text = translations[language].playMode.repeat;
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
