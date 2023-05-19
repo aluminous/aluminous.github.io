@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Video Player</title>
+</head>
+<body>
+    <div>
+        <label for="videoInput">Enter Video IDs (Format: id,start,end):</label><br>
+        <textarea id="videoInput" rows="5" cols="50"></textarea><br>
+        <label for="playMode">Play Mode:</label>
+        <select id="playMode">
+            <option value="random">Random</option>
+            <option value="sequential">Sequential</option>
+            <option value="repeat">Repeat</option>
+        </select><br>
+        <button id="startButton">Start</button>
+    </div>
+
+    <div id="player"></div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        let videoQueue = [];
+        let currentIndex = 0;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '390',
+                width: '640',
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            const anchor = window.location.hash.slice(1);
+            if (anchor) {
+                const decoded = decodeURIComponent(anchor);
+                document.getElementById('videoInput').value = decoded;
+                initializeVideoQueue(decoded);
+                playNextVideo();
+            }
+
+            document.getElementById('startButton').addEventListener('click', () => {
+                const videoInput = document.getElementById('videoInput').value;
+                initializeVideoQueue(videoInput);
+                playNextVideo();
+                window.location.hash = encodeURIComponent(videoInput);
+            });
+        }
+
+        function initializeVideoQueue(videoInput) {
+            videoQueue = videoInput.split('\n').map(line => {
+                const [id, start, end] = line.split(',');
+                return { id, start, end };
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                if (document.getElementById('playMode').value === 'repeat') {
+                    playVideo(videoQueue[currentIndex]);
+                } else {
+                    playNextVideo();
+                }
+            }
+        }
+
+        function playNextVideo() {
+            if (document.getElementById('playMode').value === 'random') {
+                currentIndex = Math.floor(Math.random() * videoQueue.length);
+            } else {
+                currentIndex = (currentIndex + 1) % videoQueue.length;
+            }
+            playVideo(videoQueue[currentIndex]);
+        }
+
+        function playVideo({ id, start, end }) {
+            player.loadVideoById({ videoId: id, startSeconds: start, endSeconds: end });
+        }
+    </script>
+</body>
+</html>
