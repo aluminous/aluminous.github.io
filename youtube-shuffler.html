@@ -91,6 +91,7 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
         }
 
         function playNextVideo() {
+            lastIndex = currentIndex;
             const playMode = document.getElementById('playMode').value;
             if (playMode === 'random') {
                 currentIndex = Math.floor(Math.random() * videoQueue.length);
@@ -100,7 +101,6 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
                     newIndex = Math.floor(Math.random() * videoQueue.length);
                 } while (newIndex === lastIndex && videoQueue.length > 1);
                 currentIndex = newIndex;
-                lastIndex = currentIndex;
             } else {
                 currentIndex = (currentIndex + 1) % videoQueue.length;
             }
@@ -113,3 +113,4 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
     </script>
 </body>
 </html>
+
