@@ -78,7 +78,6 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
         let player;
         let videoQueue = [];
         let currentIndex = 0;
-        let lastIndex = -1;
 
         document.getElementById('videoInputLabel').textContent = translations[language].videoInputLabel;
         document.getElementById('startButton').textContent = translations[language].startButton;
@@ -151,19 +150,20 @@ have not verified the code quality or thoroughly tested for edge cases, etc.
         }
 
         function playNextVideo() {
-            lastIndex = currentIndex;
+            let newIndex;
+
             const playMode = document.getElementById('playMode').value;
             if (playMode === 'random') {
-                currentIndex = Math.floor(Math.random() * videoQueue.length);
+                newIndex = Math.floor(Math.random() * videoQueue.length);
             } else if (playMode === 'randomNoRepeat') {
-                let newIndex;
                 do {
                     newIndex = Math.floor(Math.random() * videoQueue.length);
-                } while (newIndex === lastIndex && videoQueue.length > 1);
-                currentIndex = newIndex;
+                } while (newIndex === currentIndex && videoQueue.length > 1);
             } else {
-                currentIndex = (currentIndex + 1) % videoQueue.length;
+                newIndex = (currentIndex + 1) % videoQueue.length;
             }
+
+            currentIndex = newIndex;
             playVideo(videoQueue[currentIndex]);
         }
 
